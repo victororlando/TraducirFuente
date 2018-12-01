@@ -1,5 +1,9 @@
 
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,8 +16,16 @@ public class AnalizadorSintactico {
     List<String> tokensPermitidos = new ArrayList<String>();
     boolean errorEncontrado;
     private int cantidadTab;
+    FileWriter fichero = null;
+    PrintWriter pw = null;
 
-    public void run() throws IOException {
+    public void analizarTraducirFuente() throws IOException {
+        Path currentRelativePath = Paths.get("");
+        String path = currentRelativePath.toAbsolutePath().toString();
+        String output = path + "/output.txt";
+        fichero = new FileWriter(output);
+        pw = new PrintWriter(fichero);
+
         AnalizadorLexico al = new AnalizadorLexico();
         tokensList = al.analizarFuente();
         //al.analizarFuente();
@@ -23,13 +35,15 @@ public class AnalizadorSintactico {
         if (!errorEncontrado) {
             System.out.println("El código fuente es sintacticamente correcto");
         }
+        try {
+            if (null != fichero) {
+                fichero.close();
+            }
+        } catch (Exception e2) {
+            e2.printStackTrace();
+        }
         System.exit(0);
 
-    }
-
-    public static void main(String[] args) throws IOException {
-        AnalizadorSintactico as = new AnalizadorSintactico();
-        as.run();
     }
 
     public void check_input(String[] firsts, String[] follows) {
@@ -135,13 +149,16 @@ public class AnalizadorSintactico {
                 case "L_LLAVE":
                     match("{");
                     System.out.println("\n" + tabString + "<item>");
+                    pw.println("\n" + tabString + "<item>");
                     cantidadTab++;
                     attribute_list(new String[]{"}"});
                     System.out.println(tabString + "</item>");
+                    pw.println(tabString + "</item>");
                     match("}");
                     break;
                 case "R_LLAVE":
                     System.out.println(tabString + "<item>");
+                    pw.println(tabString + "<item>");
                     match("}");
                     break;
                 default:
@@ -204,16 +221,22 @@ public class AnalizadorSintactico {
                 tabString = tabString + "\t";
             }
             System.out.print(tabString + "<" + lex + ">");
+            pw.print(tabString + "<" + lex + ">");
             att_name(new String[]{":"});
             match(":");
             System.out.print(token.getLexema());
+            pw.print(token.getLexema());
 
             att_valor(new String[]{",", "}"});
 
-            if (token.getComponenteLexico().equals("L_CORCHETE") || token.getComponenteLexico().equals("R_LLAVE") ) {
+            if (token.getComponenteLexico().equals("L_CORCHETE") || token.getComponenteLexico().equals("R_LLAVE")) {
                 System.out.println(tabString + "</" + lex + ">");
+                pw.print(tabString + "</" + lex + ">");
+                pw.print("\n");
             } else {
                 System.out.println("</" + lex + ">");
+                pw.print("</" + lex + ">");
+                pw.print("\n");
 
             }
             check_input(synchset, new String[]{"String"});
