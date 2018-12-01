@@ -1,2 +1,5 @@
 # TraducirFuente
-Traduce el archivo fuete.txt en el directorio
+Traduce el archivo fuente.txt en el directorio
+
+Ejecutar:
+java TraducirFuente
