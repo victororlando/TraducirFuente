@@ -42,6 +42,7 @@ public class AnalizadorSintactico {
         } catch (Exception e2) {
             e2.printStackTrace();
         }
+				System.out.println("Archivo output.txt generado");
         System.exit(0);
 
     }
